@@ -1,5 +1,6 @@
 import pigpio
 import time
+from data_storage import DataStorage
 from thermometer import Thermometer
 
 
@@ -36,16 +37,17 @@ if pi.connected:
     pi.set_mode(yellow_gpio, pigpio.INPUT)
     pi.set_mode(green_gpio, pigpio.INPUT)
 
-    thermometer = Thermometer(therm_gpio, pi)
+    data_storage = DataStorage()
+
+    thermometer = Thermometer(therm_gpio, pi, data_storage)
     thermometer.start()
 
     i = 0
     while(i < 1000):
         thermometer.trigger()
         time.sleep(3)
-        hum = thermometer.humidity
-        temp = thermometer.temperature
-        print(str(temp) + " - " + str(hum))
+        temp = data_storage.temperature
+        print(str(temp) + " - " + str(data_storage.humidity))
         if temp >= red_threshold:
             red_light_on(pi)
         elif temp >= yellow_threshold:

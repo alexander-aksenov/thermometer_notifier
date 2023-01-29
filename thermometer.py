@@ -2,9 +2,10 @@ import pigpio
 import time
 
 class Thermometer:
-    def __init__(self, gpio, pi):
+    def __init__(self, gpio, pi, data_storage):
         self.__gpio = gpio
         self.__pi = pi
+        self.__ds = data_storage
         self.__high_tick = 0
         self.__bit = 40
         self.__bad_MM = 0
@@ -15,8 +16,6 @@ class Thermometer:
         self.__tH = 0
         self.__tL = 0
         self.__CS = 0
-        self.__rhum = -999
-        self.__temp = -999
         self.__cb = None
 
     def _cb(self, gpio, level, tick):
@@ -37,13 +36,13 @@ class Thermometer:
                     self.__no_response = 0
                     total = self.__hH + self.__hL + self.__tH + self.__tL
                     if (total & 255) == self.__CS:
-                        self.__rhum = ((self.__hH << 8) + self.__hL) * 0.1
+                        self.__ds.humidity = ((self.__hH << 8) + self.__hL) * 0.1
                         if self.__tH & 128:
                             mult = -0.1
                             self.__tH = self.__tH & 127
                         else:
                             mult = 0.1
-                        self.__temp = ((self.__tH << 8) + self.__tL) * mult
+                        self.__ds.temperature = ((self.__tH << 8) + self.__tL) * mult
                     else:
                         self.__bad_CS += 1
             elif self.__bit >= 24:
@@ -95,11 +94,3 @@ class Thermometer:
         if self.__cb:
             self.__cb.cancel()
             self.__cb = None
-
-    @property
-    def temperature(self):
-        return self.__temp
-
-    @property
-    def humidity(self):
-        return self.__rhum
