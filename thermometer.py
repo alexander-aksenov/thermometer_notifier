@@ -92,7 +92,7 @@ class Thermometer:
         cb = self.__pi.callback(self.__gpio, pigpio.EITHER_EDGE, self._cb)
 
     def stop(self):
-        self.__pi.set_watchdog(gpio, 0)
+        self.__pi.set_watchdog(self.__gpio, 0)
         if self.__cb:
             self.__cb.cancel()
             self.__cb = None

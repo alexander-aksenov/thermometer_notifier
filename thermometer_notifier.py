@@ -31,6 +31,11 @@ def green_light_on(pi):
     pi.write(yellow_gpio, pigpio.LOW)
     pi.write(red_gpio, pigpio.LOW)
 
+def all_lights_off(pi):
+    pi.write(green_gpio, pigpio.LOW)
+    pi.write(yellow_gpio, pigpio.LOW)
+    pi.write(red_gpio, pigpio.LOW)
+
 
 pi = pigpio.pi()
 if pi.connected:
@@ -63,6 +68,7 @@ if pi.connected:
             green_light_on(pi)
         i += 1
     thermometer.stop()
+    all_lights_off(pi)
     logger.close()
 pi.stop()
 
