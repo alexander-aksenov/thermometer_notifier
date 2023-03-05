@@ -46,14 +46,16 @@ if pi.connected:
     while(i < 1000):
         thermometer.trigger()
         time.sleep(3)
-        temp = data_storage.temperature
-        print(str(temp) + " - " + str(data_storage.humidity))
+        temp = "%.2f" % data_storage.temperature
+        hum = "%.2f" % data_storage.humidity
+        print(str(temp) + " - " + str(hum))
         if temp >= red_threshold:
             red_light_on(pi)
         elif temp >= yellow_threshold:
             yellow_light_on(pi)
         else:
             green_light_on(pi)
+        i += 1
     thermometer.stop()
 pi.stop()
 
