@@ -1,7 +1,10 @@
+import datetime
+
 class DataStorage:
     def __init__(self):
         self.__temp = -999
         self.__hum = -999
+        self.__time = datetime.datetime.now()
 
     @property
     def temperature(self):
@@ -19,3 +22,10 @@ class DataStorage:
     def humidity(self, h):
         self.__hum = h
 
+    @property
+    def time(self):
+        return self.__time
+
+    @time.setter
+    def time(self, t):
+        self.__time = t

@@ -1,5 +1,6 @@
 import pigpio
 import time
+import datetime
 
 class Thermometer:
     def __init__(self, gpio, pi, data_storage):
@@ -43,6 +44,7 @@ class Thermometer:
                         else:
                             mult = 0.1
                         self.__ds.temperature = ((self.__tH << 8) + self.__tL) * mult
+                        self.__ds.time = datetime.datetime.now()
                     else:
                         self.__bad_CS += 1
             elif self.__bit >= 24:
