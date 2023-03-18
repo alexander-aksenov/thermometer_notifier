@@ -1,7 +1,7 @@
 import asyncio
 
 from telegram import ForceReply, Update
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, JobQueue, filters
 
 class TgBot:
     def __init__(self, app, loop, data_storage):
@@ -10,6 +10,7 @@ class TgBot:
         self.__ds = data_storage
         self.__context = None
         self.__chat_id = None
+        self.__message = None
 
     @classmethod
     def create(cls, token, data_storage):
@@ -27,11 +28,25 @@ class TgBot:
     def send_temperature(self):
         if self.__context is None:
             return
+        if self.__message:
+            return
         time = self.__ds.time
         temperature = "%.1f" % self.__ds.temperature
         write_str = "Temperature needs your attention: " + str(time) + " - " + str(temperature) + "°"
-        coro = self.__context.bot.send_message(self.__chat_id, text=write_str)
-        asyncio.ensure_future(coro)
+        self.__message = write_str
+        self.__job_queue.run_once(self._send_message, 1, chat_id=self.__chat_id)
+
+    def _remove_job_if_exists(name, context):
+        jobs = context.get_jobs_by_name(name)
+        for job in jobs:
+            job.schedule_removal()
+
+    async def _send_message(self, context):
+        # TODO: fix races
+        if self.__message:
+            msg = self.__message
+            self.__message = None
+            await self.__context.bot.send_message(self.__chat_id, text=msg)
 
     async def _start(self, update, context):
         if self.__context:
@@ -39,6 +54,7 @@ class TgBot:
         else:
             self.__context = context
             self.__chat_id = update.effective_message.chat_id
+            self.__job_queue = context.job_queue
             out_str = "Welcome, you'll receive here news about temerature changes"
 
         user = update.effective_user
