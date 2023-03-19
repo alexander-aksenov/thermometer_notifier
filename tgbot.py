@@ -4,21 +4,22 @@ from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, JobQueue, filters
 
 class TgBot:
-    def __init__(self, app, loop, data_storage):
+    def __init__(self, app, loop, data_storage, plotter):
         self.__app = app
         self.__async_loop = loop
         self.__ds = data_storage
         self.__context = None
         self.__chat_id = None
         self.__message = None
+        self.__plotter = plotter
 
     @classmethod
-    def create(cls, token, data_storage):
+    def create(cls, token, data_storage, plotter):
         # Create loop for the thread
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         app = Application.builder().token(token).build()
-        res = cls(app, asyncio.new_event_loop(), data_storage)
+        res = cls(app, asyncio.new_event_loop(), data_storage, plotter)
         res.add_handlers()
         return res
 
@@ -72,7 +73,7 @@ class TgBot:
         await update.message.reply_text(write_str)
 
     async def _graphic(self, update, context):
-        await update.message.reply_text("Sorry, not yet implemented")
+        await update.message.reply_photo(self.__plotter.plot_to_file())
 
 
     def add_handlers(self):

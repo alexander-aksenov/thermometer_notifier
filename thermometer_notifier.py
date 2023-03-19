@@ -6,6 +6,7 @@ from data_storage import DataStorage
 from thermometer import Thermometer
 from logger import Logger
 from tgbot import TgBot
+from plotter import Plotter
 import config
 
 
@@ -79,7 +80,9 @@ if pi.connected:
     thermometer = Thermometer(config.THERMOMETER_GPIO, pi, data_storage)
     thermometer.start()
 
-    tgbot = TgBot.create(TOKEN, data_storage)
+    plotter = Plotter(config.LOG_FILE, config.GREEN_ZONE, config.YELLOW_ZONE, config.IMAGE_FILE)
+
+    tgbot = TgBot.create(TOKEN, data_storage, plotter)
 
     read_th = Thread(target=read_thread, args=(thermometer, logger, data_storage, pi, tgbot))
     read_th.start()
