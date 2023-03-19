@@ -39,9 +39,7 @@ class Plotter:
         hum_plot = []
 
         for time, temp, hum in self.__data:
-            time_diff = time - start_time
-
-            time_plot.append(str(time_diff))
+            time_plot.append(str(time))
             temp_plot.append(temp)
             hum_plot.append(hum / 10)
 
@@ -71,10 +69,12 @@ class Plotter:
     def _plot(self):
         self._prepare_plot()
         plt.show()
+        plt.clf()
 
     def _plot_to_file(self):
         self._prepare_plot()
         plt.savefig(self.__image_path, bbox_inches='tight')
+        plt.clf()
         return self.__image_path
 
 

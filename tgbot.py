@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timedelta
 
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, JobQueue, filters
@@ -73,7 +74,8 @@ class TgBot:
         await update.message.reply_text(write_str)
 
     async def _graphic(self, update, context):
-        await update.message.reply_photo(self.__plotter.plot_to_file())
+        since = datetime.now() - timedelta(hours=1)
+        await update.message.reply_photo(self.__plotter.plot_to_file(since=since))
 
 
     def add_handlers(self):
