@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 import datetime
 
 class Plotter:
@@ -8,6 +9,7 @@ class Plotter:
         self.__red_edges = red_temp_edges
         self.__data = []
         self.__image_path = image_path
+        self.__TICKER = 20
 
     def _read_data(self, since, till):
         with open(self.__temp_log, 'r') as log:
@@ -42,11 +44,28 @@ class Plotter:
         time_plot = []
         temp_plot = []
         hum_plot = []
+        x_axis = []
+        x_axis_labels = []
+        start_time = None
+        i = 0
 
         for time, temp, hum in self.__data:
             time_plot.append(str(time))
             temp_plot.append(temp)
             hum_plot.append(hum / 10)
+            if not start_time:
+                x_axis.append(str(time))
+                x_axis_labels.append(str(time))
+                start_time = time
+                i += 1
+            else:
+                if i == 0:
+                    x_axis.append(str(time))
+                    val = str(round((time - start_time).total_seconds() / 60))
+                    x_axis_labels.append('+' + val + 'm')
+                i += 1
+            if i == self.__TICKER:
+                i = 0
 
         plt.plot(time_plot, temp_plot)
 
@@ -70,6 +89,8 @@ class Plotter:
         plt.fill(xs, green_ys, facecolor='#00FF0055')
 
         plt.plot(time_plot, hum_plot)
+
+        plt.xticks(x_axis, x_axis_labels)
 
     def _plot(self):
         self._prepare_plot()
