@@ -43,8 +43,10 @@ def check_temp_is_yellow(temp):
     return False
 
 def data_read_iter(thermometer, logger, data_storage, pi, tgbot):
+    print("Trigger thermomether")
     thermometer.trigger()
     time.sleep(config.ITER_DELAY_TIME)
+    print("Write log")
     logger.write()
     temp = data_storage.temperature
     temp_out = "%.1f" % data_storage.temperature
@@ -54,17 +56,17 @@ def data_read_iter(thermometer, logger, data_storage, pi, tgbot):
     if check_temp_is_green(temp):
         green_light_on(pi)
     elif check_temp_is_yellow(temp):
+        print("Send notification")
         tgbot.send_temperature()
         yellow_light_on(pi)
     else:
+        print("Send notification")
         tgbot.send_temperature()
         red_light_on(pi)
 
 def read_thread(thermometer, logger, data_storage, pi, tgbot):
-    i = 0
-    while(i < 50):
+    while(True):
         data_read_iter(thermometer, logger, data_storage, pi, tgbot)
-        i += 1
 
 
 pi = pigpio.pi()

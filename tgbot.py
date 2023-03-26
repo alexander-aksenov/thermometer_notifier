@@ -53,6 +53,7 @@ class TgBot:
         # TODO: fix races
         if self.__message:
             msg = self.__message
+            print("Schedule warning sending")
             self.__message = None
             await self.__context.bot.send_message(self.__chat_id, text=msg)
 
@@ -73,6 +74,7 @@ class TgBot:
         )
 
     async def _temperature(self, update, context):
+        print("Send temperature")
         time = self.__ds.time
         temperature = "%.1f" % self.__ds.temperature
         humidity = "%.1f" % self.__ds.humidity
@@ -80,8 +82,13 @@ class TgBot:
         await update.message.reply_text(write_str)
 
     async def _graphic(self, update, context):
+        print("Send graphic")
         since = datetime.now() - timedelta(hours=1)
-        await update.message.reply_photo(self.__plotter.plot_to_file(since=since))
+        plot_file = self.__plotter.plot_to_file(since=since)
+        if plot_file:
+            await update.message.reply_photo(plot_file)
+        else:
+            await update.message.reply_text("No data to plot graph right now")
 
 
     def add_handlers(self):
