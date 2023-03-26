@@ -36,7 +36,13 @@ class TgBot:
         temperature = "%.1f" % self.__ds.temperature
         write_str = "Temperature needs your attention: " + str(time) + " - " + str(temperature) + "°"
         self.__message = write_str
-        self.__job_queue.run_once(self._send_message, 1, chat_id=self.__chat_id)
+        time_to_run = datetime.now() + timedelta(seconds=1)
+        self.__job_queue.run_custom(self._send_message,
+                                    {'trigger': 'date',
+                                     'run_date': time_to_run,
+                                     'misfire_grace_time': None,
+                                     'timezone': time_to_run.tzinfo},
+                                    chat_id=self.__chat_id)
 
     def _remove_job_if_exists(name, context):
         jobs = context.get_jobs_by_name(name)
