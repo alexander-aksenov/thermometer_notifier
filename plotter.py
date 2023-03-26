@@ -18,7 +18,12 @@ class Plotter:
 
             # Remove seconds and microseconds
             time_str = time_str[:-8]
-            date = datetime.datetime.strptime(date_str + " " + time_str, "%Y-%m-%d %H:%M:%S")
+            parse_date_str = date_str + " " + time_str
+            try:
+                date = datetime.datetime.strptime(parse_date_str, "%Y-%m-%d %H:%M:%S")
+            except Exception as e:
+                print("Exception " + str(e) + " while parsing <" + parse_date_str + ">")
+                continue
             if since:
                 if date < since:
                     continue
@@ -80,11 +85,17 @@ class Plotter:
 
     def plot(self, since=None, till=None):
         self._read_data(since, till)
-        self._plot()
+        if self.__data:
+            self._plot()
+        else:
+            print("No data to make a plot")
 
     def plot_to_file(self, since=None, till=None):
         self._read_data(since, till)
-        return self._plot_to_file()
+        if self.__data:
+            return self._plot_to_file()
+        else:
+            return None
 
 
 
